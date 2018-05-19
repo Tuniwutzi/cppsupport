@@ -1,4 +1,4 @@
-#include <StdUtils/FileSystem/Path.h>
+#include <FileSystem/Path.hpp>
 
 #ifdef _WINDOWS
 #include <Shlwapi.h>
@@ -8,26 +8,24 @@
 #include <limits.h>
 #endif
 
-#include <StdUtils/Exceptions.h>
-
 
 using namespace std;
 
 
-namespace StdUtils
+namespace cppsupport
 {
 	namespace FileSystem
 	{
-		String Path::Combine(String const& pathA, String const& pathB)
+		std::string Path::Combine(std::string const& pathA, std::string const& pathB)
 		{
-			String rv(pathA);
+			std::string rv(pathA);
 
 #ifdef _WINDOWS
             if (pathA.find_last_of('/') != pathA.size() -1 && pathA.find_last_of('\\') != pathA.size() - 1)
 			{
 				if (pathB.find('/') != 0 && pathB.find('\\') != 0)
 				{
-                    if (pathA.find('/') != String::npos)
+                    if (pathA.find('/') != std::string::npos)
 						rv += "/";
 					else
 						rv += "\\";
@@ -51,7 +49,7 @@ namespace StdUtils
 		}
 
 
-        bool Path::IsAbsolute(String const& path)
+        bool Path::IsAbsolute(std::string const& path)
         {
 #ifdef _WINDOWS
             //if (path.size() >= 2)
@@ -65,7 +63,7 @@ namespace StdUtils
             return path.find('/') == 0;
 #endif
         }
-        String Path::ToAbsolute(String const& path)
+        std::string Path::ToAbsolute(std::string const& path)
         {
 #ifdef _WINDOWS
             char buffer[512];
@@ -82,16 +80,16 @@ namespace StdUtils
                     throw OSApiException("Could not determine full path", GetLastError());
             }
 
-            return String(buffer);
+            return std::string(buffer);
 
 #else
             char buffer[PATH_MAX + 1];
             if (path.size() == 0)
             {
             	if (!getcwd(buffer, sizeof(buffer)))
-            		throw OSApiException("Could not determine current working directory", errno);
+            		throw std::runtime_error("Could not determine current working directory");
             	else
-            		return String(buffer);
+            		return std::string(buffer);
             }
             else if (!Path::IsAbsolute(path))
             {
@@ -99,10 +97,10 @@ namespace StdUtils
 				{
 					//TODO: File/Dir does not exist -> must build smallest possible absolute path manually
 					//Can not just concatentate working directory and path, because FullPath is used for checking equality of File-instances.
-					throw OSApiException("Error determining full path", errno);
+					throw std::runtime_error("Error determining full path");
 				}
 				else
-					return String(buffer);
+					return std::string(buffer);
             }
             else
             	return path;
@@ -112,7 +110,7 @@ namespace StdUtils
 //                return this->getPath();
 //            else
 //            {
-//                String workingDirectory;
+//                std::string workingDirectory;
 //#ifdef _WINDOWS
 //                char buffer[MAX_PATH];
 //                DWORD chars = GetCurrentDirectoryA(sizeof(buffer), buffer);
@@ -140,23 +138,23 @@ namespace StdUtils
 //                    return Path::Combine(workingDirectory, this->getPath());
 //            }
         }
-        String Path::GetRoot(String const& path)
+        std::string Path::GetRoot(std::string const& path)
         {
 #ifdef _WINDOWS
-            String abs = Path::ToAbsolute(path);
-            vector<String> parts = Path::GetParts(path);
+            std::string abs = Path::ToAbsolute(path);
+            vector<std::string> parts = Path::GetParts(path);
             return parts.at(0);
 #else
             return "/";
 #endif
         }
 
-        vector<String> Path::GetParts(String const& path)
+        vector<std::string> Path::GetParts(std::string const& path)
         {
-            vector<String> rv;
-            String::size_type len = 0;
+            vector<std::string> rv;
+            std::string::size_type len = 0;
 
-            for (String::size_type i = 0; i < path.size(); i++)
+            for (std::string::size_type i = 0; i < path.size(); i++)
             {
                 char c = path.at(i);
 #ifdef _WINDOWS
@@ -175,45 +173,45 @@ namespace StdUtils
 
             return rv;
         }
-        String Path::GetLastSegment(String const& path)
+        std::string Path::GetLastSegment(std::string const& path)
 		{
 #ifdef _WINDOWS
-            String::size_type li = path.find_last_of('\\');
-			if (li == String::npos)
+            std::string::size_type li = path.find_last_of('\\');
+			if (li == std::string::npos)
 			{
                 li = path.find_last_of('/');
-				if (li == String::npos)
+				if (li == std::string::npos)
 					return path;
 			}
 
 			return path.substr(li + 1);
 #else
-			String::size_type li = path.find_last_of('/');
-			if (li == String::npos)
+			std::string::size_type li = path.find_last_of('/');
+			if (li == std::string::npos)
 				return path;
 			else
 				return path.substr(li + 1);
 #endif
 		}
-        String Path::GetFileName(String const& path, bool includeExtension)
+        std::string Path::GetFileName(std::string const& path, bool includeExtension)
         {
-            String fn = Path::GetLastSegment(path);
+            std::string fn = Path::GetLastSegment(path);
             if (!includeExtension)
             {
-                String::size_type li = fn.find_last_of('.');
-                if (li != String::npos)
+                std::string::size_type li = fn.find_last_of('.');
+                if (li != std::string::npos)
                     fn = fn.substr(0, li);
             }
             return fn;
         }
-		String Path::GetFileExtension(String const& path)
+		std::string Path::GetFileExtension(std::string const& path)
 		{
-			String fn = Path::GetLastSegment(path);
-			String::size_type li = fn.find_last_of('.');
-			if (li != String::npos)
+			std::string fn = Path::GetLastSegment(path);
+			std::string::size_type li = fn.find_last_of('.');
+			if (li != std::string::npos)
 				return fn.substr(li);
 			else
-				throw Exception("File has no extension");
+				throw std::runtime_error("File has no extension");
 		}
 	}
 }

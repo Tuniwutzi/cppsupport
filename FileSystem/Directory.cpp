@@ -122,7 +122,7 @@ namespace cppsupport
     		return (wildcarded || name.length() == 0);
         }
         bool getStats(char const* path, struct stat* fi);
-        static bool isFile(struct dirent* ent)
+        static bool isFile(const std::string& dirPath, struct dirent* ent)
         {
 #ifdef _DIRENT_HAVE_D_TYPE
 			switch (ent->d_type)
@@ -138,7 +138,7 @@ namespace cppsupport
 			}
 #else
 			struct stat fi;
-			if (getStats(ent->d_name, &fi))
+			if (getStats(Path::Combine(dirPath, ent->d_name).c_str(), &fi))
 			{
 				if (S_ISREG(fi.st_mode))
 					return true;
@@ -183,7 +183,7 @@ namespace cppsupport
         		//In jedem Fall erstmal den Typen checken, da in den meisten Systemen
         		//das feld d_type von dirent definiert ist.
         		//Daher ist Typcheck in den meisten Fällen billiger, als das Pattern.
-        		bool file = isFile(ent);
+        		bool file = isFile(path, ent);
 
         		if (file)
         		{
@@ -192,6 +192,13 @@ namespace cppsupport
         		}
         		else
         		{
+#ifndef WINDOWS
+                    std::string entryName(ent->d_name);
+                    if (entryName == "." || entryName == "..") {
+                        continue;
+                    }
+#endif
+                    
         			string entryPath(Path::Combine(path, ent->d_name));
         			if (directories && fitsPattern(ent->d_name, patternParts))
     					directories->push_back(Directory(entryPath));
