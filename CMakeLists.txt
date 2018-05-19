@@ -12,7 +12,8 @@ include_directories(${_CD})
 set(sources
     "${_CD}/FileSystem/FileSystemEntry.cpp"
     "${_CD}/FileSystem/File.cpp"
-    "${_CD}/FileSystem/Directory.cpp")
+    "${_CD}/FileSystem/Directory.cpp"
+    "${_CD}/FileSystem/Path.cpp")
 
 if(WIN32)
     add_definitions(-DWINDOWS)
