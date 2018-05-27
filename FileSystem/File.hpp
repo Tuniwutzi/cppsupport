@@ -28,7 +28,7 @@ namespace cppsupport
 			void move(std::string const& to, bool overwrite = false) override;
 
 			std::ofstream openWrite(bool binary = false);
-			std::ifstream openRead(bool binary = false);
+			std::ifstream openRead(bool binary = false) const;
 			std::fstream open(bool binary = false);
 
 			FileInfo getFileInfo() const;

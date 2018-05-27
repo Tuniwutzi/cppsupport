@@ -138,16 +138,15 @@ namespace cppsupport
 			//#endif
 		}
 
-		//Geht so nicht, da ifstream nicht kopiert werden kann
-		//		ifstream File::openRead(bool binary)
-		//		{
-		//            this->assertValid();
-		//
-		//            if (this->exists())
-		//			    return ifstream(this->getPath().data(), istream::in | (binary ? istream::binary : (ios::openmode)0));
-		//            else
-		//                throw Exception("File does not exist");
-		//		}
+        ifstream File::openRead(bool binary) const
+        {
+            this->assertValid();
+
+            if (this->exists())
+                return ifstream(this->getPath().data(), istream::in | (binary ? istream::binary : (ios::openmode)0));
+            else
+                throw std::runtime_error("File does not exist");
+        }
 
 		//TODO: Unit test
 		File::FileInfo File::getFileInfo() const

@@ -137,8 +137,9 @@ namespace cppsupport
 				throw Exception("Unexpected file entry type in directory");
 			}
 #else
+            auto fullPath = Path::Combine(dirPath, ent->d_name);
 			struct stat fi;
-			if (getStats(Path::Combine(dirPath, ent->d_name).c_str(), &fi))
+			if (getStats(fullPath.c_str(), &fi))
 			{
 				if (S_ISREG(fi.st_mode))
 					return true;
@@ -146,8 +147,9 @@ namespace cppsupport
 					return false;
 				else
 					throw std::runtime_error("Unexpected file entry type in directory");
-			}
-			//else sollte nicht vorkommen; bedeutet file nicht gefunden
+			} else {
+                throw std::runtime_error("file system entry not found: " + fullPath);
+            }
 #endif
         }
         static void enumerateEntries(std::string const& path, std::string const& pattern, bool recursive, vector<File>* files, vector<Directory>* directories)
