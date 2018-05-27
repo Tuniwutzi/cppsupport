@@ -213,5 +213,25 @@ namespace cppsupport
 			else
 				throw std::runtime_error("File has no extension");
 		}
+        
+        std::string Path::ToRelative(std::string const& path, std::string const& baseDirectory) {
+            auto fullPath = Path::ToAbsolute(path);
+            auto fullBase = Path::ToAbsolute(baseDirectory);
+            
+            if (fullPath.find(fullBase) != 0) {
+                throw std::runtime_error("The base directory (" + baseDirectory + ") is not a parent of the entry pointed to by path (" + path + ")");
+            }
+            
+            auto rv = fullPath.substr(fullBase.size());
+#ifndef _WINDOWS
+            if (rv.at(0) == '/') {
+                rv = rv.substr(1);
+                if (rv.empty()) {
+                    rv = ".";
+                }
+            }
+#endif
+            return rv;
+        }
 	}
 }
