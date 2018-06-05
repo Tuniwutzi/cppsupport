@@ -3,7 +3,13 @@
 #include <FileSystem/Path.hpp>
 #include <FileSystem/Directory.hpp>
 
-#ifndef WINDOWS
+// std::max
+#include <algorithm>
+
+#ifdef WINDOWS
+#define NOMINMAX
+#include <windows.h>
+#else
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -80,14 +86,14 @@ namespace cppsupport
 
 #ifdef _WINDOWS
             //TODO: Verbessern; Mehrere Slashes/Backslashes, insbesodere vermischt, am Ende des Pfads machen alles putt
-            String::size_type backPos = fullPath.find_last_of('\\');
-            String::size_type slashPos = fullPath.find_last_of('/');
-            if (backPos == String::npos || slashPos == fullPath.size() - 1)
+            std::string::size_type backPos = fullPath.find_last_of('\\');
+            std::string::size_type slashPos = fullPath.find_last_of('/');
+            if (backPos == std::string::npos || slashPos == fullPath.size() - 1)
                 backPos = -1;
-            if (slashPos == String::npos || slashPos == fullPath.size() - 1)
+            if (slashPos == std::string::npos || slashPos == fullPath.size() - 1)
                 slashPos = -1;
 
-            String::size_type pos = max(backPos, slashPos);
+            std::string::size_type pos = std::max(backPos, slashPos);
             if (pos == -1)
                 return Directory();
             else

@@ -8,6 +8,9 @@
 
 #include <FileSystem/Directory.hpp>
 
+#ifdef _WINDOWS
+#include <windows.h>
+#endif
 
 using namespace std;
 
@@ -73,7 +76,7 @@ namespace cppsupport
 #ifdef _WINDOWS
 			HANDLE hfile = CreateFileA(this->getPath().data(), 0, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
 			if (hfile == INVALID_HANDLE_VALUE)
-				throw OSApiException("Could not create file", GetLastError());
+				throw std::runtime_error("Could not create file");
 			else
 				CloseHandle(hfile);
 #else
@@ -95,7 +98,7 @@ namespace cppsupport
 
 #ifdef _WINDOWS
 			if (!MoveFileExA(this->getPath().data(), to.data(), MOVEFILE_COPY_ALLOWED | (overwrite ? MOVEFILE_REPLACE_EXISTING : 0)))
-				throw OSApiException("Error moving file", GetLastError());
+				throw std::runtime_error("Error moving file");
 #else
 			bool targetExists = File::Exists(to);
 

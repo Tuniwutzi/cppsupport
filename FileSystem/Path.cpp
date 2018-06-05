@@ -72,12 +72,12 @@ namespace cppsupport
             {
                 DWORD chars = GetCurrentDirectoryA(sizeof(buffer), buffer);
                 if (!chars)
-                    throw OSApiException("Could not determine full path, could not get working directory", GetLastError());
+                    throw std::runtime_error("Could not determine full path, could not get working directory");
             }
             else
             {
                 if (!GetFullPathNameA(path.data(), sizeof(buffer), buffer, NULL)) //TODO: Wenn der Buffer zu klein ist bekomme ich die mindestgr��e des Buffers zur�ck, die gebraucht wird
-                    throw OSApiException("Could not determine full path", GetLastError());
+                    throw std::runtime_error("Could not determine full path");
             }
 
             return std::string(buffer);

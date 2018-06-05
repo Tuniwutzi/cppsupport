@@ -25,8 +25,12 @@ set(sources
 set(sources
     ${sources}
     ${filesystem_sources})
+add_library(cppsupport ${sources})
 
 if(WIN32)
+	target_link_libraries(cppsupport
+		ws2_32.lib
+		Shlwapi.lib)
     add_definitions(-DWINDOWS)
 endif()
 if(APPLE)
@@ -36,7 +40,7 @@ if(UNIX AND NOT APPLE)
     add_definitions(-DUNIX)
 endif()
 
-add_library(cppsupport ${sources})
+
 
 
 #if(CMAKE_COMPILER_IS_GNUCXX)

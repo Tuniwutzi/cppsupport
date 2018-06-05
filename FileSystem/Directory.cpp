@@ -2,7 +2,7 @@
 
 
 #ifdef _WINDOWS
-#include <shellapi.h>
+#include <windows.h>
 #else
 #include <dirent.h>
 #include <sys/types.h>
@@ -34,7 +34,7 @@ namespace cppsupport
 			{
 				DWORD le = GetLastError();
 				if (le != ERROR_FILE_NOT_FOUND) //TODO: FileNotFound? Nicht eher ERROR_NO_MORE_FILES?
-					throw OSApiException("Error enumerating files", le);
+					throw std::runtime_error("Error enumerating files");
 			}
 
 			if (fd != INVALID_HANDLE_VALUE)
@@ -83,7 +83,7 @@ namespace cppsupport
 
 				DWORD le = GetLastError();
 				if (le != ERROR_NO_MORE_FILES)
-					throw OSApiException("Error enumerating files", le);
+					throw std::runtime_error("Error enumerating files");
 			}
 
             //TODO: Rekursion mit Pattern effektiver
@@ -277,7 +277,7 @@ namespace cppsupport
 
 #ifdef _WINDOWS
             if (!CreateDirectoryA(this->getPath().data(), NULL))
-                throw OSApiException("Could not create directory", GetLastError());
+                throw std::runtime_error("Could not create directory");
 #else
             //TODO: Permissions
             int rv = mkdir(this->getFullPath().data(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
@@ -291,7 +291,7 @@ namespace cppsupport
 
 #ifdef _WINDOWS
             if (!RemoveDirectoryA(this->getPath().data()))
-                throw OSApiException("Could not remove directory", GetLastError());
+                throw std::runtime_error("Could not remove directory");
 #else
             int rv = rmdir(this->getFullPath().data());
             if (rv)
@@ -305,7 +305,7 @@ namespace cppsupport
 #ifdef _WINDOWS
             //TODO: Funktioniert, laut Doku, nicht, wenn Verzeichnisse (NICHT Dateien) auf unterschiedlichen "volumes" liegen
             if (!MoveFileExA(this->getPath().data(), to.data(), MOVEFILE_COPY_ALLOWED | (overwrite ? MOVEFILE_REPLACE_EXISTING : 0)))
-				throw OSApiException("Error moving directory", GetLastError());
+				throw std::runtime_error("Error moving directory");
 #else
             if (Directory::Exists(to))
             {
@@ -435,7 +435,7 @@ namespace cppsupport
 #else
         	//TODO?: Laut stackoverflow funktioniert chdir auch fuer windows; laut MSDN aber nur _chdir
             if (!SetCurrentDirectoryA(dir.getFullPath().data()))
-                throw OSApiException("Could not set working directory", GetLastError());
+                throw std::runtime_error("Could not set working directory");
 #endif
         }
 	}
